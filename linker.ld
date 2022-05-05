@@ -50,5 +50,11 @@ SECTIONS
   } > high_memory AT>boot_sector
   kernel_load_address = LOADADDR(.text);
   kernel_exec_address = ADDR(.text);
+  kernel_exec_end = .;
+  kernel_load_sector_count = (kernel_exec_end-kernel_exec_address)/512;
   end = .; _end = .; __end = .;
 }
+/* NOTE:
+ * The current boot sector supports up to 85KiB total OS size, and 84KiB of third stage code.
+ * this is easily circumvented by simply increaseing the number of sectors read.
+ */

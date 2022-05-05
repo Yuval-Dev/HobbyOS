@@ -1,7 +1,13 @@
 [SECTION .boot]
 [GLOBAL start]
+[EXTERN kernel_load_sector_count]
 [BITS 16]
 start:
+	xor ax, ax
+	mov ds, ax
+	mov es, ax
+	jmp 0x0:adjust 
+adjust:
 	mov ax, 0x2401
 	int 0x15 ;enables the A20 line through bios
 
@@ -11,14 +17,26 @@ start:
 
 	mov [disk],dl ;saves the booted disk number passed by bios
 
+
 	mov ah, 0x2             ;to read sectors
-	mov al, 0xF               ;number of sectors to read
+	mov al, 0x41               ;number of sectors to read
 	mov ch, 0               ;cylinder number
 	mov dh, 0               ;head number
 	mov cl, 2               ;sector number
 	mov dl, [disk]          ;disk number (the one we booted off of)
-	mov bx, copy_target     ;where to copy the read sectors to
+	mov bx, 0x7e00     ;where to copy the read sectors to
 	int 0x13                ;create the interupt (0x13)
+	
+	mov ah, 0x2
+	mov al, 0x80
+	mov ch, 1
+	mov cl, 5
+	mov bx, 0x1000
+	mov es, bx
+	xor bx, bx
+	int 0x13
+
+.end:
 	cli                     ;clear interupts
 	lgdt [gdt_pointer]      ;load the global descriptor table (go into pm)
 	mov eax, cr0
@@ -63,32 +81,32 @@ dw 0xaa55
 [EXTERN kmain]
 [EXTERN kernel_load_address]
 [EXTERN kernel_exec_address]
+[EXTERN kernel_exec_end]
 copy_target:
-  hello: db "Second Stage Loaded",0
-  dq kernel_load_address
+	hello: db "Second Stage Loaded",0
 disk_loaded_stage:
-  mov ebx, kernel_exec_address
-  mov esi, kernel_load_address
-  .loop2:
-    lodsb
-    cmp esi, 0x10000
-    je after
-    mov byte [ebx], al
-    inc ebx
-    jmp .loop2 
-  after:
-  mov esi,hello
-  mov ebx,0xb8000
-  .loop:
-    lodsb
-    or al,al
-    jz halt
-    or eax,0x0F00
-    mov word [ebx], ax
-    add ebx,2
-    jmp .loop
+	mov ebx, kernel_exec_address
+	mov esi, kernel_load_address
+	.loop2:
+		lodsb
+		mov byte [ebx], al
+		inc ebx
+		cmp ebx, kernel_exec_end
+		je after
+		jmp .loop2 
+	after:
+	mov esi,hello
+	mov ebx,0xb8000
+	.loop:
+		lodsb
+		or al,al
+		jz halt
+		or eax,0x0F00
+		mov word [ebx], ax
+		add ebx,2
+		jmp .loop
 halt:
-  mov esp, 0x200000
-  call kmain
-  cli
-  hlt
+	mov esp, 0x200000
+	call kmain
+	cli
+	hlt

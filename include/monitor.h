@@ -48,3 +48,10 @@ void print_hex(int num, char colour) {
 		put_char(hex[(num>>(i*4))%16], colour);
 	}
 }
+
+void print_dec(int num, char colour) {
+	if(num) {
+		print_dec(num/10, colour);
+		put_char(hex[num%10], colour);
+	}
+}

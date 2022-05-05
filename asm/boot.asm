@@ -58,11 +58,25 @@ DATA_SEG equ gdt_data - gdt_start
 
 times 510 - ($-$$) db 0
 dw 0xaa55
-copy_target:
+[SECTION .boot2]
 [BITS 32]
 [EXTERN kmain]
+[EXTERN kernel_load_address]
+[EXTERN kernel_exec_address]
+copy_target:
   hello: db "Second Stage Loaded",0
+  dq kernel_load_address
 disk_loaded_stage:
+  mov ebx, kernel_exec_address
+  mov esi, kernel_load_address
+  .loop2:
+    lodsb
+    cmp esi, 0x10000
+    je after
+    mov byte [ebx], al
+    inc ebx
+    jmp .loop2 
+  after:
   mov esi,hello
   mov ebx,0xb8000
   .loop:
@@ -74,12 +88,7 @@ disk_loaded_stage:
     add ebx,2
     jmp .loop
 halt:
-  mov esp,kernel_stack_top
+  mov esp, 0x200000
   call kmain
   cli
   hlt
-section .bss
-  align 4
-  kernel_stack_bottom: equ $
-  resb 16384 ; 16 KB
-kernel_stack_top:

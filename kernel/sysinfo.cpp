@@ -28,14 +28,7 @@ void sysinfo() {
 		}	
 		num_modes++;
 	}
-
-	//while(video_modes[num_modes]!=0xFFFF) {
-	//	if(num_modes<10) {
-	//		get_vbe_mode_info((vbe_mode_info_structure *)0x600, num_modes);
-	//		structs[num_modes] = ((vbe_mode_info_structure *)0x600)[0];
-	//	}
-	//	num_modes++;
-	//}
+	
 	print_dec(num_modes);
 	if(num_modes<=10) print_str(", printing all of them...");
 	else print_str(", printing the first 10...");

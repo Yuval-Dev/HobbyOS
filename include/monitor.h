@@ -19,11 +19,7 @@
 #define NORMAL_TEXT 0x00
 #define COLOR(foreground, background, blinking) ((((background & 0x7) >> 4) + foreground) | blinking)
 #define DEFAULT_COLOR COLOR(COLOR_GREEN,COLOR_BLACK,NORMAL_TEXT)
-extern int cursor_x;
-extern int cursor_y;
-
-extern char * hex;
-
+#include"uint.h"
 void end_line();
 
 void reset_cursor();
@@ -34,8 +30,8 @@ void put_char(char character);
 void print_str(const char* str, char colour);
 void print_str(const char* str);
 
-void print_hex(int num, char colour);
-void print_hex(int num);
+void print_hex(uint32_t num, char colour);
+void print_hex(uint32_t num);
 
 void print_dec(int num, char colour);
 void print_dec(int num);

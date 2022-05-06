@@ -37,14 +37,14 @@ void print_str(const char * str) {
 	print_str(str, DEFAULT_COLOR);
 }
 
-void print_hex(int num, char colour) {
+void print_hex(uint32_t num, char colour) {
 	print_str("0x", colour);
 	for(int i = 7; i >= 0; i--) {
-		put_char(hex[(num>>(i*4))%16], colour);
+		put_char(hex[(num>>(i*4))&0xF], colour);
 	}
 }
 
-void print_hex(int num) {
+void print_hex(uint32_t num) {
 	print_hex(num, DEFAULT_COLOR);
 }
 void print_dec(int num, char colour) {

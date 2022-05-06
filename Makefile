@@ -9,8 +9,10 @@ NASM_OBJECTS=$(wildcard ./asm/*.o)
 ./asm/%.o: ./asm/%.asm
 	$(AS) $(ASFLAGS) $<
 
+.PHONY: kernel
 kernel: $(NASM_OBJECTS)
 	$(CC) $(NASM_OBJECTS) $(SOURCES) $(CFLAGS) -o kernel.bin
 
+.PHONY: run
 run: kernel
 	qemu-system-x86_64 -fda kernel.bin

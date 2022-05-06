@@ -2,7 +2,7 @@
 #define BIOS_INT_H
 #include"uint.h"
 typedef struct __attribute__ ((packed)) {
-	uint16_t di, si, bp, sp, bc, dx, cx, ax, gs, fs, es, ds, eflags;
+	uint16_t di, si, bp, sp, bx, dx, cx, ax, gs, fs, es, ds, eflags;
 } regs16_t;
 extern regs16_t pmode_bios_interrupt_registers;
 extern uint8_t pmode_bios_interrupt_code;

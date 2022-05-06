@@ -1,5 +1,6 @@
 #include "sysinfo.h"
+#include "video.h"
 extern "C" void kmain()
 {
-	sysinfo();
+	init_video_driver();
 }

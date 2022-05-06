@@ -54,7 +54,25 @@ struct vbe_mode_info_structure {
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
+struct display_info {
+	bool graphics_mode;
+	bool linear_frame_buffer;
+	uint16_t pitch;
+	uint16_t width;
+	uint16_t height;
+	uint8_t bpp;
+	uint8_t * frame_buffer;
+	uint16_t mode_id;
+};
+
 bool get_vbe_mode_info(vbe_mode_info_structure *, uint16_t mode);
+vbe_mode_info_structure get_vbe_mode_info(uint16_t mode);
 bool get_vbe_info(vbe_info_structure *);
+vbe_info_structure get_vbe_info();
+display_info get_display_info(uint16_t mode);
 void dump_mode_info(vbe_mode_info_structure * structure);
+void init_video_driver();
+uint16_t get_current_mode();
+void set_current_mode(uint8_t);
+void dump_mode_info(display_info structure);
 #endif

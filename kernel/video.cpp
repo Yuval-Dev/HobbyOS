@@ -1,9 +1,15 @@
 #include"video.h"
 #include"bios_int.h"
 #include"monitor.h"
+#include"keyboard.h"
 vbe_info_structure vbe_info;
 display_info display_modes[256];
+uint8_t * display_buffer;
+uint16_t width, height;
+uint32_t pitch;
 uint8_t num_display_modes;
+uint8_t bpp;
+bool graphics_mode;
 uint8_t active_display_mode = 80;
 bool lfb_active;
 
@@ -86,6 +92,22 @@ void init_video_driver() {
 	for(uint8_t i = 0; i < num_display_modes; i++) {
 		if(display_modes[i].mode_id==mode_id && lfb_active==display_modes[i].linear_frame_buffer) active_display_mode = i;
 	}
+	set_current_mode(19);
+	for(uint32_t x = 0; x < 1024; x++) for(uint32_t y = 0; y < 768; y++) {
+		draw_pixel(x, y, x/8, y/6, (x/8)+(y/6));
+		if(x%100==0 && y==0) await_key();
+	}
+	await_key();
+	/*for(int i = 0; i < num_display_modes; i++) {
+		await_key();
+		reset_cursor();
+		dump_mode_info(display_modes[i]);
+		print_dec(i);
+		print_str("            ");
+	}
+	//testing graphics mode
+	set_current_mode(25);
+	await_key();*/
 }
 
 uint16_t get_current_mode() {
@@ -100,5 +122,27 @@ void set_current_mode(uint8_t mode) {
 	if(out.ax==0x004F) {
 		active_display_mode = mode;
 		lfb_active = display_modes[mode].linear_frame_buffer;
+		if(lfb_active) {
+			display_buffer = (uint8_t *)display_modes[mode].frame_buffer;
+		} else {
+			if(display_modes[mode].graphics_mode) display_buffer = 0xA00000;
+			else display_buffer = 0xB8000;
+		}
+		width = display_modes[mode].width;
+		height = display_modes[mode].height;
+		pitch = display_modes[mode].pitch;
+		bpp = display_modes[mode].bpp;
+		graphics_mode = display_modes[mode].graphics_mode;
 	}
+}
+void draw_pixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b) {
+	uint32_t pixel_offset = y*pitch + (x*(bpp/8));
+	display_buffer[pixel_offset] = b;
+	display_buffer[pixel_offset+1] = g;
+	display_buffer[pixel_offset+2] = b;
+}
+void draw_pixel(uint32_t x, uint32_t y, uint16_t c) {
+	uint32_t pixel_offset = y*pitch + (x*(bpp/8));
+	display_buffer[pixel_offset] = c&0xFF;
+	display_buffer[pixel_offset+1] = c>>8;
 }

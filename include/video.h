@@ -75,4 +75,6 @@ void init_video_driver();
 uint16_t get_current_mode();
 void set_current_mode(uint8_t);
 void dump_mode_info(display_info structure);
+void draw_pixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b);
+void draw_pixel(uint32_t x, uint32_t y, uint16_t c);
 #endif

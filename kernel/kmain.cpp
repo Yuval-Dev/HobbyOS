@@ -1,7 +1,24 @@
 #include "monitor.h"
-extern int kernel_load_address;
+#include "uint.h"
+#include "video.h"
+#include "sysinfo.h"
+void memset(void * ptr, uint8_t val, uint32_t size) {
+	for(uint32_t i = 0; i < size; i++) ((char *)ptr)[i] = val;
+}
 extern "C" void kmain()
 {
+	sysinfo();
+	
+	vbe_info_structure * tmp = (vbe_info_structure *)0x600;
+	if(!get_vbe_info(tmp)) print_str("getting vbe info was unsuccesful", DEFAULT_COLOR);
+	vbe_info_structure vbe_info = (*tmp);
+	int num_modes = 0;
+	uint16_t * video_modes = (uint16_t *)(((vbe_info.video_modes>>16)<<4) + vbe_info.video_modes&0xFFFF);
+	while(video_modes[num_modes]!=0xFFFF) num_modes++;
+	
+	print_str("Number of video modes:", DEFAULT_COLOR);
+	print_dec(num_modes, DEFAULT_COLOR);
+	end_line();
 	print_str("Stage 3 loaded! Hello world!", COLOR(COLOR_GREEN, COLOR_BLACK, NORMAL_TEXT));
 	end_line();
 	print_str("123456 in hex: ", DEFAULT_COLOR);
@@ -19,4 +36,5 @@ extern "C" void kmain()
 		}
 		for(int j = i*2; j < 10000; j+= i) is_prime[j] = false;
 	}
+	print_str("real mode bios successful!", DEFAULT_COLOR);
 }

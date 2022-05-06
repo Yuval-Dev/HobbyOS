@@ -1,8 +1,8 @@
 [SECTION .boot]
 [GLOBAL start]
-[GLOBAL pmode_bios_interrupt]
-[GLOBAL pmode_bios_interrupt_registers]
-[GLOBAL pmode_bios_interrupt_code]
+[GLOBAL pmode_bios]
+[GLOBAL pm_bios_registers]
+[GLOBAL pm_bios_interrupt]
 [EXTERN kmain]
 [EXTERN kernel_load_address]
 [EXTERN kernel_exec_address]
@@ -12,26 +12,26 @@ start:
 	xor ax, ax
 	mov ds, ax
 	mov es, ax
-	jmp 0x0:adjust ;ensure that we are at 0x0000:0x7c00 as opposed to 0x07c0:0x0000 or something like that
+	jmp 0x0:adjust 
 adjust:
 	mov ax, 0x2401
-	int 0x15 ;enables the A20 line through bios. This lets us address up to 1MiB of memory
+	int 0x15 ;enables the A20 line through bios
 
 	mov ax, 0x3
-	int 0x10 ;reset cursor position
+	int 0x10 ;I have no fucking clue what this does, just keep it bc it works
 
 
 	mov [disk],dl ;saves the booted disk number passed by bios
 
 
-	mov ah, 0x2 ;to read sectors
-	mov al, 0x41 ;number of sectors to read
-	mov ch, 0 ;cylinder number
-	mov dh, 0 ;head number
-	mov cl, 2 ;sector number
-	mov dl, [disk] ;disk number (the one we booted off of)
-	mov bx, 0x7e00 ;where to copy the read sectors to
-	int 0x13 ;create the interupt (0x13)
+	mov ah, 0x2             ;to read sectors
+	mov al, 0x41               ;number of sectors to read
+	mov ch, 0               ;cylinder number
+	mov dh, 0               ;head number
+	mov cl, 2               ;sector number
+	mov dl, [disk]          ;disk number (the one we booted off of)
+	mov bx, 0x7e00     ;where to copy the read sectors to
+	int 0x13                ;create the interupt (0x13)
 	
 	mov ah, 0x2
 	mov al, 0x80
@@ -42,6 +42,7 @@ adjust:
 	xor bx, bx
 	int 0x13
 
+.end:
 	cli                     ;clear interupts
 	lgdt [gdt_pointer]      ;load the global descriptor table (go into pm)
 	mov eax, cr0
@@ -53,9 +54,6 @@ adjust:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	jmp CODE_SEG:stage2
-[BITS 32]
-stage2:
 	mov ebx, kernel_exec_address
 	mov esi, kernel_load_address
 	.loop2:
@@ -109,21 +107,20 @@ idt_pointer:
 	dd 0x00000000
 disk equ 0x7c00 - 1
 stack_ptr equ 0x7c00 - 5
-gdt_ptr equ 0x7c00 - 11
-idt_ptr equ 0x7c00 - 17
-pmode_bios_interrupt_registers equ 0x7c00 - 33
-pmode_bios_interrupt_code equ 0x7c00 - 34
-tmp_stack equ 0x7c00 - 36
-pm_bios_stack equ 0x7c00 - 38
-pmode_bios_interrupt:
+gdt_ptr equ 0x7c00 - 9
+idt_ptr equ 0x7c00 - 13
+pm_bios_registers equ 0x7c00 - 29
+pm_bios_interrupt equ 0x7c00 - 30
+pm_bios_stack equ 0x7c00 - 34
+[BITS 32]
+pmode_bios:
 	cli
 	pusha
 	mov [stack_ptr], esp
-	mov esp, [pm_bios_stack]
 	sgdt [gdt_ptr]
 	sidt [idt_ptr]
 	lgdt [gdt_pointer]
-	mov al, [pmode_bios_interrupt_code]
+	mov al, [pm_bios_interrupt]
 	mov [bios_interrupt_byte], al
 	jmp CODE_SEG_16:.pmode_16
 .pmode_16:
@@ -145,8 +142,6 @@ pmode_bios_interrupt:
 	lidt [idt_pointer]
 	mov bx, 0x0870
 	call resetpic
-	mov [tmp_stack], sp
-	mov sp, pmode_bios_interrupt_registers
 	popa
 	pop gs
 	pop fs
@@ -156,6 +151,8 @@ pmode_bios_interrupt:
 	db 0xCD
 bios_interrupt_byte: db 0x00
 	cli
+	xor sp, sp
+	mov sp, pm_bios_stack
 	add sp, 2
 	pushf
 	push ds
@@ -163,7 +160,6 @@ bios_interrupt_byte: db 0x00
 	push fs
 	push gs
 	pusha
-	mov sp, [tmp_stack]
 	mov bx, 0x2028
 	call resetpic
 	mov eax, cr0
@@ -179,13 +175,12 @@ bios_interrupt_byte: db 0x00
 	mov gs, ax
 	mov ss, ax
 	lgdt [gdt_ptr]
-	lidt [idt_ptr]
+	lidt [ldt_ptr]
 	mov esp, [stack_ptr]
 	popa
 	sti
 	ret
-;source for resetpic:
-resetpic:                                      ; reset's 8259 master and slave pic vectors
+resetpic:                                  ; reset's 8259 master and slave pic vectors
 	push ax                                ; expects bh = master vector, bl = slave vector
 	mov  al, 0x11                          ; 0x11 = ICW1_INIT | ICW1_ICW4
 	out  0x20, al                          ; send ICW1 to master pic

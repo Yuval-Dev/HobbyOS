@@ -52,6 +52,7 @@ SECTIONS
   kernel_exec_address = ADDR(.text);
   kernel_exec_end = .;
   kernel_load_sector_count = (kernel_exec_end-kernel_exec_address)/512;
+  real_mode_ivt = ORIGIN(real_mode_ivt);
   end = .; _end = .; __end = .;
 }
 /* NOTE:

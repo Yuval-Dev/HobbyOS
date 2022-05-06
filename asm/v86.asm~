@@ -1,0 +1,35 @@
+save_stack:
+	resb 4
+save_gdt:
+	resb 4
+save_idt:
+	resb 4
+bios_idt_ptr:
+	dw 0x03FF
+	dd 0x00000000
+tmp_gdt:
+	dd 0x00000000
+	dd 0x00000000
+	.code:
+		dw 0xFFFF
+		dw 0x0000
+		db 0x00
+		db 0x9A
+		db 0x0F
+		db 0x00
+	.data:
+		dw 0xFFFF
+		dw 0x0000
+		db 0x00
+		db 0x92
+		db 0x0F
+		db 0x00
+tmp_gdt_ptr:
+	dw tmp_gdt_ptr - tmp_gdt - 1;
+	dd tmp_gdt
+code_seg equ 0x0008
+data_set equ 0x0010
+tm_int:
+	cli
+	pusha
+

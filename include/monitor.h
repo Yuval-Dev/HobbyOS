@@ -1,3 +1,5 @@
+#ifndef MONITOR_H
+#define MONITOR_H
 #define COLOR_BLACK 0x0
 #define COLOR_BLUE 0x1
 #define COLOR_GREEN 0x2
@@ -17,41 +19,25 @@
 #define NORMAL_TEXT 0x00
 #define COLOR(foreground, background, blinking) ((((background & 0x7) >> 4) + foreground) | blinking)
 #define DEFAULT_COLOR COLOR(COLOR_GREEN,COLOR_BLACK,NORMAL_TEXT)
-int cursor_x = 0;
-int cursor_y = 0;
+extern int cursor_x;
+extern int cursor_y;
 
-char hex[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+extern char * hex;
 
-void end_line() {
-	cursor_x = 0;
-	cursor_y = (cursor_y+1)%25;
-}
+void end_line();
 
-void put_char(char character, char colour) {
-	*(short*)(0xb8000+cursor_x*2+cursor_y*160) = (colour << 8) + character;
-	cursor_x++;
-	if(cursor_x==80) {
-		cursor_x = 0;
-		cursor_y++;
-	}
-	if(cursor_y==25) cursor_y=0;
-}
+void reset_cursor();
 
-void print_str(const char* str, char colour) {
-	int i = 0;
-	while(str[i]!=0) put_char(str[i++], colour);
-}
+void put_char(char character, char colour);
+void put_char(char character);
 
-void print_hex(int num, char colour) {
-	print_str("0x", colour);
-	for(int i = 7; i >= 0; i--) {
-		put_char(hex[(num>>(i*4))%16], colour);
-	}
-}
+void print_str(const char* str, char colour);
+void print_str(const char* str);
 
-void print_dec(int num, char colour) {
-	if(num) {
-		print_dec(num/10, colour);
-		put_char(hex[num%10], colour);
-	}
-}
+void print_hex(int num, char colour);
+void print_hex(int num);
+
+void print_dec(int num, char colour);
+void print_dec(int num);
+
+#endif

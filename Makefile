@@ -4,7 +4,7 @@ SOURCES=./kernel/*.cpp
 AS=nasm
 ASFLAGS=-f elf
 NASM_SOURCES=$(wildcard ./asm/*.asm)
-NASM_OBJECTS=$(wildcard ./asm/*.o)
+NASM_OBJECTS=$(NASM_SOURCES:.asm=.o)
 
 ./asm/%.o: ./asm/%.asm
 	$(AS) $(ASFLAGS) $<

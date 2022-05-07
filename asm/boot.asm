@@ -111,10 +111,10 @@ disk equ 0x7c00 - 1
 stack_ptr equ 0x7c00 - 5
 gdt_ptr equ 0x7c00 - 11
 idt_ptr equ 0x7c00 - 17
-pmode_bios_interrupt_registers equ 0x7c00 - 33
-pmode_bios_interrupt_code equ 0x7c00 - 34
-tmp_stack equ 0x7c00 - 36
-pm_bios_stack equ 0x7c00 - 38
+pmode_bios_interrupt_registers equ 0x7c00 - 35
+pmode_bios_interrupt_code equ 0x7c00 - 36
+tmp_stack equ 0x7c00 - 38
+pm_bios_stack equ 0x7c00 - 40
 pmode_bios_interrupt:
 	cli
 	pusha

@@ -1,7 +1,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 #include"uint.h"
-struct vbe_info_structure {
+typedef struct vbe_info_structure {
 	char signature[4];
 	uint16_t version;	
 	uint32_t oem;
@@ -14,9 +14,9 @@ struct vbe_info_structure {
 	uint32_t product_rev;
 	char reserved[222];
 	char oem_data[256];
-} __attribute__ ((packed));
+} __attribute__ ((packed)) vbe_info_structure;
 
-struct vbe_mode_info_structure {
+typedef struct vbe_mode_info_structure {
 	uint16_t attributes;
 	uint8_t window_a;
 	uint8_t window_b;
@@ -52,9 +52,9 @@ struct vbe_mode_info_structure {
 	uint32_t off_screen_mem_off;
 	uint16_t off_screen_mem_size;
 	uint8_t reserved1[206];
-} __attribute__ ((packed));
+} __attribute__ ((packed)) vbe_mode_info_structure;
 
-struct display_info {
+typedef struct display_info {
 	bool graphics_mode;
 	bool linear_frame_buffer;
 	uint16_t pitch;
@@ -63,7 +63,7 @@ struct display_info {
 	uint8_t bpp;
 	uint8_t * frame_buffer;
 	uint16_t mode_id;
-};
+} display_info;
 
 bool get_vbe_mode_info(vbe_mode_info_structure *, uint16_t mode);
 vbe_mode_info_structure get_vbe_mode_info(uint16_t mode);

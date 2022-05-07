@@ -93,11 +93,11 @@ void init_video_driver() {
 		if(display_modes[i].mode_id==mode_id && lfb_active==display_modes[i].linear_frame_buffer) active_display_mode = i;
 	}
 	set_current_mode(19);
-	for(uint32_t x = 0; x < 1024; x++) for(uint32_t y = 0; y < 768; y++) {
-		draw_pixel(x, y, x/8, y/6, (x/8)+(y/6));
-		if(x%100==0 && y==0) await_key();
-	}
-	await_key();
+	//for(uint32_t x = 0; x < 1024; x++) for(uint32_t y = 0; y < 768; y++) {
+	//	draw_pixel(x, y, x/8, y/6, (x/8)+(y/6));
+	//	if(x%100==0 && y==0) await_key();
+	//}
+	//await_key();
 	/*for(int i = 0; i < num_display_modes; i++) {
 		await_key();
 		reset_cursor();

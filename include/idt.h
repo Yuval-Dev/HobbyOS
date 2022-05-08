@@ -1,5 +1,23 @@
 #pragma once
 #include <stdint.h>
+#include"string.h"
+#include"io.h"
+#define IRQ0 32
+#define IRQ1 33
+#define IRQ2 34
+#define IRQ3 35
+#define IRQ4 36
+#define IRQ5 37
+#define IRQ6 38
+#define IRQ7 39
+#define IRQ8 40
+#define IRQ9 41
+#define IRQ10 42
+#define IRQ11 43
+#define IRQ12 44
+#define IRQ13 45
+#define IRQ14 46
+#define IRQ15 47
 typedef struct {
 	uint16_t isr_low;
 	uint16_t kernel_cs;
@@ -13,11 +31,23 @@ typedef struct {
 	uint32_t base;
 } __attribute__((packed)) idtr_t;
 
-__attribute__ ((aligned(0x10))) static idt_entry_t idt[256];
-static idtr_t idt_ptr;
-__attribute__((noreturn)) extern void exception_handler(void);
-static void idt_set_gate(uint8_t, uint32_t, uint16_t, uint8_t);
+typedef struct {
+	uint32_t ds;
+	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+	uint32_t int_no, err_code;
+	uint32_t eip, cs, eflags, useresp, ss;
+} __attribute__((packed)) registers_t;
 
+typedef void (*isr_t)(registers_t);
+
+extern load_idt();
+__attribute__ ((aligned(0x10))) static idt_entry_t idt[256];
+static isr_t interrupt_handlers[256];
+static idtr_t idt_ptr;
+void isr_handler(registers_t regs);
+void irq_handler(registers_t regs);
+void init_idt();
+void register_interrupt_handler(uint8_t n, isr_t handler);
 extern void isr0 ();
 extern void isr1 ();
 extern void isr2 ();
@@ -51,4 +81,20 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+extern void irq0 ();
+extern void irq1 ();
+extern void irq2 ();
+extern void irq3 ();
+extern void irq4 ();
+extern void irq5 ();
+extern void irq6 ();
+extern void irq7 ();
+extern void irq8 ();
+extern void irq9 ();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
 

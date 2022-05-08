@@ -1,8 +1,6 @@
 #include"sysinfo.h"
 #include"monitor.h"
-#include"cpuinfo.h"
-#include"video.h"
-void sysinfo() {
+/*void sysinfo() {
 	reset_cursor();
 	print_str("System Information: ");
 	end_line();
@@ -37,6 +35,6 @@ void sysinfo() {
 		dump_mode_info(&structs[i]);
 		end_line();
 	}
-}
+}*/
 
 

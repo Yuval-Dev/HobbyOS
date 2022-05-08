@@ -107,13 +107,17 @@ gdt_pointer:
 idt_pointer:
 	dw 0x03FF
 	dd 0x00000000
-disk equ 0x7c00 - 1
-stack_ptr equ 0x7c00 - 5
-gdt_ptr equ 0x7c00 - 11
-idt_ptr equ 0x7c00 - 17
+gdt_ptr:
+	dq 0x0
+idt_ptr:
+	dq 0x0
+disk:
+	db 0x0
+stack_ptr:
+	dq 0x0
+tmp_stack:
+	dq 0x0
 pmode_bios_interrupt_registers equ 0x7c00 - 33
-pmode_bios_interrupt_code equ 0x7c00 - 34
-tmp_stack equ 0x7c00 - 36
 pm_bios_stack equ 0x7c00 - 38
 pmode_bios_interrupt:
 	cli
@@ -123,8 +127,6 @@ pmode_bios_interrupt:
 	sgdt [gdt_ptr]
 	sidt [idt_ptr]
 	lgdt [gdt_pointer]
-	mov al, [pmode_bios_interrupt_code]
-	mov [bios_interrupt_byte], al
 	jmp CODE_SEG_16:.pmode_16
 .pmode_16:
 [BITS 16]
@@ -154,7 +156,7 @@ pmode_bios_interrupt:
 	pop ds
 	sti
 	db 0xCD
-bios_interrupt_byte: db 0x00
+pmode_bios_interrupt_code: db 0x00
 	cli
 	add sp, 2
 	pushf

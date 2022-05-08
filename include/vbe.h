@@ -52,9 +52,15 @@ typedef struct vbe_mode_info {
 	uint16_t off_screen_mem_size;
 	uint8_t reserved1[206];
 } __attribute__ ((packed)) vbe_mode_info_t;
+typedef enum visual_mode {
+	text, graphics
+} visual_mode_t;
+typedef enum buffer_mode {
+	banks, linear_frame
+} buffer_mode_t;
 typedef struct mode_info {
-	enum {text_mode, graphics_mode} visual_mode;
-	enum {banks, linear_frame} buffer_mode;
+	visual_mode_t visual_mode;
+	buffer_mode_t buffer_mode;
 	uint16_t pitch, width, height;
 	uint8_t bpp;
 	uint8_t * frame_buffer;
@@ -62,4 +68,14 @@ typedef struct mode_info {
 } mode_info_t;
 static vbe_info_t vbe_info;
 static mode_info_t modes[256];
+void init_vbe();
+static void set_mode(uint8_t);
+static void draw_pixel(uint32_t, uint32_t, uint8_t, uint8_t, uint8_t);
+static visual_mode_t visual_mode;
+static buffer_mode_t buffer_mode;
+static uint16_t pitch, width, height;
+static uint8_t bpp;
+static uint8_t * frame_buffer;
+static uint8_t active_mode;
+static uint8_t num_modes = 0;
 

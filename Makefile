@@ -1,6 +1,6 @@
 CC=i686-elf-gcc
 CFLAGS=-nostdlib -ffreestanding -std=c++11 -mno-red-zone -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -fpermissive -I./include/ -T linker.ld
-SOURCES=./kernel/*.cpp
+SOURCES=./kernel/*.c
 AS=nasm
 ASFLAGS=-f elf
 NASM_SOURCES=$(wildcard ./asm/*.asm)

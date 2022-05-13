@@ -1,4 +1,5 @@
 #include"keyboard.h"
+#include"vbe.h"
 unsigned char kbdmix[128] =
 {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
@@ -43,7 +44,7 @@ static void keyboard_irq_handler(registers_t regs) {
 	status = inb(0x64);
 	scancode = inb(0x60);
 	if(scancode<128)
-	put_char(kbdmix[scancode%128]);
+	for(uint8_t i = 0; i < 50; i++) print(kbdmix[scancode%128]);
 }
 void init_kbd() {
 	register_interrupt_handler(IRQ1, keyboard_irq_handler);

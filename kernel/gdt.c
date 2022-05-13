@@ -1,5 +1,5 @@
 #include"gdt.h"
-#include"monitor.h"
+#include"vbe.h"
 static void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran)
 {
 	gdt[num].base_low = (base & 0xFFFF);

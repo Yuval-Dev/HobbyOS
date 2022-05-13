@@ -86,7 +86,7 @@ void isr_handler(registers_t regs)
 {
 	print_str("recieved interrupt: ");
 	print_dec(regs.int_no);
-	put_char('\n');
+	print_char('\n');
 
 	if (interrupt_handlers[regs.int_no] != 0)
 	{
